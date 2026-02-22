@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Swarm: Overdrive</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game-container">
+        <!-- The main rendering canvas -->
+        <canvas id="gameCanvas"></canvas>
+
+        <!-- UI Overlays -->
+        <div id="ui-layer">
+            <div id="hud" class="hidden">
+                <div class="top-bar">
+                    <div id="level-display">Level: <span id="level-val">1</span></div>
+                    <div id="score-display">Score: <span id="score-val">0</span></div>
+                </div>
+                <div class="bottom-bar hidden" id="boss-hp-container">
+                    <div id="boss-name">GIANT GLITCH BOSS</div>
+                    <div id="boss-hp-bar">
+                        <div id="boss-hp-fill"></div>
+                    </div>
+                </div>
+                <div id="xp-bar-container">
+                    <div id="xp-bar-fill"></div>
+                </div>
+            </div>
+
+            <div id="menu-screen" class="screen">
+                <h1>NEON SWARM:<br><span class="highlight">OVERDRIVE</span></h1>
+                <p>WASD to Move | Auto-Attack</p>
+                <button id="start-btn" class="neon-btn">START OVERDRIVE</button>
+            </div>
+
+            <div id="gameover-screen" class="screen hidden">
+                <h1>SYSTEM FAILURE</h1>
+                <p>Final Score: <span id="final-score">0</span></p>
+                <p>Max Level: <span id="final-level">1</span></p>
+                <button id="restart-btn" class="neon-btn">REBOOT SYSTEM</button>
+            </div>
+
+            <div id="upgrade-screen" class="screen hidden">
+                <h2>SYSTEM UPGRADE AVAILABLE</h2>
+                <div id="upgrade-options" class="upgrade-container">
+                    <!-- Cards injected via JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Core Engine -->
+    <script src="src/engine/Input.js"></script>
+    <script src="src/engine/Pool.js"></script>
+    <script src="src/engine/Game.js"></script>
+    
+    <!-- Entities -->
+    <script src="src/entities/Player.js"></script>
+    <script src="src/entities/Enemy.js"></script>
+    <script src="src/entities/Projectile.js"></script>
+    <script src="src/entities/DataCube.js"></script>
+    <script src="src/entities/Particle.js"></script>
+    
+    <!-- Effects -->
+    <script src="src/effects/PostProcessor.js"></script>
+    
+    <!-- Main Entry -->
+    <script src="src/main.js"></script>
+</body>
+</html>
