@@ -16,13 +16,11 @@ A high-performance HTML5 Canvas "Bullet Heaven" roguelike built with vanilla Jav
 
 ## How to Run Locally
 
-Since this project uses pure HTML/JS/CSS without a bundler, you can run it using any simple local web server to avoid CORS issues from `file://` protocols (though it may run directly from the file system as well).
+You do not need any backend server, Python, or Node.js to run this game. Because all assets and scripts are standard browser-compatible JavaScript, you can run it purely locally!
 
-Using Python:
-```bash
-python3 -m http.server 8000
-```
-Then navigate to `http://localhost:8000` in your browser.
+1. Open the project folder.
+2. Double-click **`index.html`** to open it in your default web browser (Chrome, Firefox, Safari, Edge).
+3. The game will run instantly.
 
 Using Node.js (`http-server`):
 ```bash

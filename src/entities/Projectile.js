@@ -10,14 +10,19 @@ class Projectile {
         this.size = 4;
         this.target = null;
         this.game = null;
+        this.penetration = 1;
+        this.hitTargets = new Set(); // To avoid hitting tracking the same enemy multiple times in one frame
     }
 
-    spawn(x, y, target) {
+    spawn(x, y, target, penetration = 1) {
         this.active = true;
         this.x = x;
         this.y = y;
         this.target = target;
         this.game = target.game;
+        this.penetration = penetration;
+        this.hitTargets.clear();
+        this.modified = false; // Reset modification flag for damage boosters
 
         // Calculate velocity
         const dx = target.x - x;
@@ -36,15 +41,27 @@ class Projectile {
         this.x += this.vx * dt;
         this.y += this.vy * dt;
 
-        // Collision with target (simple bounding box / distance)
-        if (this.target && this.target.active) {
-            const dx = this.target.x - this.x;
-            const dy = this.target.y - this.y;
-            const dist = Math.sqrt(dx * dx + dy * dy);
+        // Collision with any active enemies (since it can pierce now, we check all close enough)
+        if (this.game && this.game.enemies) {
+            for (let i = 0; i < this.game.enemies.active.length; i++) {
+                const enemy = this.game.enemies.active[i];
+                if (this.hitTargets.has(enemy)) continue;
 
-            if (dist < this.target.size + this.size) {
-                this.target.takeDamage(this.damage);
-                this.active = false;
+                const dx = enemy.x - this.x;
+                const dy = enemy.y - this.y;
+                const distSq = dx * dx + dy * dy;
+                const hitDist = enemy.size + this.size;
+
+                if (distSq < hitDist * hitDist) {
+                    enemy.takeDamage(this.damage);
+                    this.hitTargets.add(enemy);
+                    this.penetration--;
+
+                    if (this.penetration <= 0) {
+                        this.active = false;
+                        break;
+                    }
+                }
             }
         }
 

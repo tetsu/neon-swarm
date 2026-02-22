@@ -83,8 +83,8 @@ class Game {
     triggerLevelUp() {
         this.currentState = this.STATE.UPGRADE_SELECT;
 
-        // Create 1 upgrade option for normal level up
-        this.showUpgrades(1);
+        // Show 3 upgrade options for normal level up
+        this.showUpgrades(3);
     }
 
     triggerBossLoot() {
@@ -92,6 +92,35 @@ class Game {
 
         // Create 3 upgrade options for boss kill
         this.showUpgrades(3);
+    }
+
+    getAvailableUpgrades() {
+        return [
+            { title: 'Rapid Fire', desc: 'Decrease attack cooldown', apply: () => { this.player.attackCooldown = Math.max(0.1, this.player.attackCooldown * 0.85); } },
+            { title: 'Agility', desc: 'Increase movement speed', apply: () => { this.player.speed += 50; } },
+            {
+                title: 'Damage Up', desc: 'Increase projectile damage', apply: () => {
+                    if (!this.player.damageMult) this.player.damageMult = 1;
+                    this.player.damageMult += 0.5;
+                }
+            },
+            {
+                title: 'Piercing Rounds', desc: 'Projectiles pass through +1 enemy', apply: () => {
+                    this.player.penetration += 1;
+                }
+            },
+            {
+                title: 'Multi-Shot', desc: 'Fire at +1 additional target simultaneously', apply: () => {
+                    this.player.multiShot += 1;
+                }
+            },
+            {
+                title: 'Overclocked Lasers', desc: 'Massively increase projectile flight speed', apply: () => {
+                    if (!this.gameProjSpeedMult) this.gameProjSpeedMult = 1;
+                    this.gameProjSpeedMult *= 1.5;
+                }
+            }
+        ];
     }
 
     showUpgrades(count) {
@@ -102,21 +131,19 @@ class Game {
         const container = document.getElementById('upgrade-options');
         container.innerHTML = '';
 
-        const upgrades = [
-            { title: 'Rapid Fire', desc: 'Decrease attack cooldown', apply: () => this.player.attackCooldown *= 0.8 },
-            { title: 'Agility', desc: 'Increase movement speed', apply: () => this.player.speed += 50 },
-            {
-                title: 'Damage Up', desc: 'Increase projectile damage', apply: () => {
-                    // To apply to all future projectiles, we can just say player has a damage multiplier
-                    // but since pool creates them, we'll store on player.
-                    if (!this.player.damageMult) this.player.damageMult = 1;
-                    this.player.damageMult += 0.5;
-                }
-            }
-        ];
+        // Get all available upgrades and shuffle them
+        const availableUpgrades = this.getAvailableUpgrades();
+        // Simple Fisher-Yates shuffle
+        for (let i = availableUpgrades.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [availableUpgrades[i], availableUpgrades[j]] = [availableUpgrades[j], availableUpgrades[i]];
+        }
 
-        for (let i = 0; i < count; i++) {
-            const upg = upgrades[Math.floor(Math.random() * upgrades.length)];
+        // Pick top 'count' upgrades (ensures no duplicates)
+        const selectedUpgrades = availableUpgrades.slice(0, count);
+
+        for (let i = 0; i < selectedUpgrades.length; i++) {
+            const upg = selectedUpgrades[i];
 
             const card = document.createElement('div');
             card.className = 'upgrade-card';
@@ -127,15 +154,6 @@ class Game {
                 container.innerHTML = '';
                 screen.classList.add('hidden');
                 document.getElementById('hud').classList.remove('hidden');
-
-                // For normal level up it only takes 1 click, for boss loot this simplistic 
-                // implementation just gives 1 out of the 3 shown. To give 3 at once:
-                if (count === 3) {
-                    // Automatically apply the other two or just apply them and close.
-                    // "pick 3 upgrades at once instead of one" -> maybe it applies 3 random ones 
-                    // or allows selecting 3? The prompt says "allows the player to pick 3 upgrades at once"
-                    // Let's interpret as picking 1 from a larger pool, OR applying 3 automatically.
-                }
 
                 this.currentState = this.STATE.PLAYING;
             });
@@ -230,10 +248,14 @@ class Game {
             this.boss.update(dt);
         }
 
-        // Projectile damage modifier hotfix
+        // Projectile modifiers
         for (let p of this.projectiles.active) {
-            if (!p.modified && this.player.damageMult) {
-                p.damage *= this.player.damageMult;
+            if (!p.modified) {
+                if (this.player.damageMult) p.damage *= this.player.damageMult;
+                if (this.gameProjSpeedMult) {
+                    p.vx *= this.gameProjSpeedMult;
+                    p.vy *= this.gameProjSpeedMult;
+                }
                 p.modified = true;
             }
         }
@@ -242,12 +264,12 @@ class Game {
         this.spawnTimer += dt;
         if (this.spawnTimer >= this.spawnRate) {
             this.spawnTimer = 0;
-            // Spawn multiple depending on time
-            const count = Math.floor(1 + (this.playTime / 10));
+            // Spawn multiple depending on time (scales MUCH slower now)
+            const count = Math.floor(1 + (this.playTime / 60)); // Add just 1 extra enemy every 60 seconds
             for (let i = 0; i < count; i++) this.spawnEnemy();
 
-            // Increase diff
-            this.spawnRate = Math.max(0.1, this.spawnRate - 0.01);
+            // Increase diff (drain spawn rate extremely slowly)
+            this.spawnRate = Math.max(0.7, this.spawnRate - 0.001);
         }
 
         // Boss logic (60s feature set C)

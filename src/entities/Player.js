@@ -9,13 +9,17 @@ class Player {
 
         this.level = 1;
         this.xp = 0;
-        this.xpNeeded = 10;
+        this.xpNeeded = 5; // Fast initial level up
 
         this.attackTimer = 0;
         this.attackCooldown = 1.0; // seconds
 
         this.hp = 100;
         this.maxHp = 100;
+
+        // Weapon Upgrades
+        this.penetration = 1; // How many enemies a projectile can hit before dying
+        this.multiShot = 1; // How many projectiles fired at once
     }
 
     update(dt) {
@@ -50,9 +54,8 @@ class Player {
     attack() {
         if (!this.game.enemies || this.game.enemies.active.length === 0) return;
 
-        // Find nearest enemy
-        let nearest = null;
-        let minDist = Infinity;
+        // Find nearest enemies (sort by distance)
+        let targets = [];
 
         for (let i = 0; i < this.game.enemies.active.length; i++) {
             const enemy = this.game.enemies.active[i];
@@ -60,16 +63,18 @@ class Player {
             const dy = enemy.y - this.y;
             const distSq = dx * dx + dy * dy;
 
-            if (distSq < minDist) {
-                minDist = distSq;
-                nearest = enemy;
-            }
+            targets.push({ enemy, distSq });
         }
 
-        if (nearest) {
-            // Fire projectile
+        targets.sort((a, b) => a.distSq - b.distSq);
+
+        // Fire at the closest N targets based on multiShot
+        const shotsToFire = Math.min(this.multiShot, targets.length);
+
+        for (let i = 0; i < shotsToFire; i++) {
+            const target = targets[i].enemy;
             const proj = this.game.projectiles.get();
-            proj.spawn(this.x, this.y, nearest);
+            proj.spawn(this.x, this.y, target, this.penetration);
         }
     }
 

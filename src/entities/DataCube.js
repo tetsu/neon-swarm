@@ -24,8 +24,12 @@ class DataCube {
         const dy = this.game.player.y - this.y;
         const distSq = dx * dx + dy * dy;
 
+        // Apply magnet multiplier if exists
+        const magnetMult = (this.game && this.game.gameMagnetMult) ? this.game.gameMagnetMult : 1;
+        const actualRange = this.collectRange * magnetMult;
+
         // Attraction to player
-        if (distSq < this.collectRange * this.collectRange) {
+        if (distSq < actualRange * actualRange) {
             const dist = Math.sqrt(distSq);
             this.x += (dx / dist) * this.speed * dt;
             this.y += (dy / dist) * this.speed * dt;
