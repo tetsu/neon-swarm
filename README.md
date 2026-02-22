@@ -3,6 +3,7 @@
 A high-performance HTML5 Canvas "Bullet Heaven" roguelike built with vanilla JavaScript.
 
 ![Live Demo](https://img.shields.io/badge/Play-Live_Demo-brightgreen?style=for-the-badge&logo=github)
+
 **Play the game here:** [https://tetsu.github.io/neon-swarm](https://tetsu.github.io/neon-swarm)
 
 [GitHub Repository](https://github.com/tetsu/neon-swarm)
