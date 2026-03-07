@@ -34,7 +34,8 @@ class Enemy {
 
         // Drop XP
         const drop = this.game.dataCubes.get();
-        drop.spawn(this.game, this.x, this.y);
+        const xpAmount = Math.max(1, Math.floor((10 + (this.game.player.level * 2)) / 5) - 1);
+        drop.spawn(this.game, this.x, this.y, xpAmount);
 
         // Chain Reaction Logic (Feature Set A)
         if (Math.random() < 0.10) { // 10% chance

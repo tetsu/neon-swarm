@@ -49,6 +49,10 @@ class Player {
             this.attack();
             this.attackTimer = 0;
         }
+
+        // Update UI HP
+        const hpPct = Math.max(0, this.hp / this.maxHp) * 100;
+        document.getElementById('player-hp-fill').style.width = hpPct + '%';
     }
 
     attack() {

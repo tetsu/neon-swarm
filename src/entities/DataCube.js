@@ -8,13 +8,18 @@ class DataCube {
         this.color = '#3f3'; // Neon green
         this.collectRange = 100;
         this.speed = 300;
+        this.xpValue = 1;
     }
 
-    spawn(game, x, y) {
+    spawn(game, x, y, xpValue = 1) {
         this.active = true;
         this.game = game;
         this.x = x;
         this.y = y;
+        this.xpValue = xpValue;
+
+        // Scale size slightly with xpValue, but keep base around 6. Max addition is +10.
+        this.size = 6 + Math.min(10, Math.floor((xpValue - 1) * 2));
     }
 
     update(dt) {
@@ -36,7 +41,7 @@ class DataCube {
 
             // Collection
             if (dist < this.game.player.size + this.size) {
-                this.game.player.gainXp(1);
+                this.game.player.gainXp(this.xpValue);
                 this.active = false;
             }
         }
