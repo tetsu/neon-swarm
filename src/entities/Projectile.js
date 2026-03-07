@@ -42,9 +42,19 @@ class Projectile {
         this.y += this.vy * dt;
 
         // Collision with any active enemies (since it can pierce now, we check all close enough)
-        if (this.game && this.game.enemies) {
-            for (let i = 0; i < this.game.enemies.active.length; i++) {
-                const enemy = this.game.enemies.active[i];
+        if (this.game) {
+            let possibleTargets = [];
+            if (this.game.enemies) {
+                for (let i = 0; i < this.game.enemies.active.length; i++) {
+                    possibleTargets.push(this.game.enemies.active[i]);
+                }
+            }
+            if (this.game.boss && this.game.boss.active) {
+                possibleTargets.push(this.game.boss);
+            }
+
+            for (let i = 0; i < possibleTargets.length; i++) {
+                const enemy = possibleTargets[i];
                 if (this.hitTargets.has(enemy)) continue;
 
                 const dx = enemy.x - this.x;
